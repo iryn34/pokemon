@@ -16,10 +16,10 @@ const useStyles1 = makeStyles(theme => ({
 
 function TablePaginationActions(props) {
     const classes = useStyles1();
-		const theme = useTheme();
-		console.log(props);
+	const theme = useTheme();
+	console.log(props);
 
-		const {count, page, rowsPerPage, onChangePage} = props;
+	const {count, page, rowsPerPage, onChangePage} = props;
   
     const handleFirstPageButtonClick = event => {
       onChangePage(event, 0);
@@ -38,34 +38,34 @@ function TablePaginationActions(props) {
     }
 
 		return (
-			<div>
+			<div className={classes.root}>
 				<IconButton
 					onClick={handleFirstPageButtonClick}
 					disabled={page === 0}
 					aria-label="First Page"
 				>
-					<FirstPageIcon />
+					{theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
 				</IconButton>
 				<IconButton 
 					onClick={handleBackButtonClick} 
 					disabled={page === 0} 
 					aria-label="Previous Page"
 				>
-					<KeyboardArrowLeft />
+					{theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
 				</IconButton>
 				<IconButton
 					onClick={handleNextButtonClick}
 					disabled={page >= Math.ceil(count / rowsPerPage) - 1}
 					aria-label="Next Page"
 				>
-					<KeyboardArrowRight />
+					{theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
 				</IconButton>
 				<IconButton
 					onClick={handleLastPageButtonClick}
 					disabled={page >= Math.ceil(count / rowsPerPage) - 1}
 					aria-label="Last Page"
 				>
-					<LastPageIcon />
+					{theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
 				</IconButton>
 			</div>
 		);

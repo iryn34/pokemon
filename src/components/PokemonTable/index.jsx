@@ -16,6 +16,7 @@ class PokemonTable extends Component {
     count: 20,
     page: 0,
     rowsPerPage: 5,
+    offset: 0,
   };
 
   handleChangePage = (event, newPage) => {
@@ -65,9 +66,7 @@ class PokemonTable extends Component {
             }}
             onChangePage={this.handleChangePage}
             onChangeRowsPerPage={this.handleChangeRowsPerPage}
-            ActionsComponent={() => TablePaginationActions({
-              count, page, rowsPerPage, onChangePage: this.handleChangePage
-            })}
+            ActionsComponent={TablePaginationActions}
           />
         </TableRow>
       </TableFooter>
@@ -75,12 +74,15 @@ class PokemonTable extends Component {
   }
 
   renderRows() {
+    const { page, rowsPerPage } = this.state;
     const {pokemons, onClick } = this.props;
 
-    return pokemons.map(pokemon => {
+    return pokemons.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(pokemon => {
       return <PokemonTableRow 
         key={pokemon.id}
         pokemon={pokemon}
+        page={page}
+        rowsPerPage={rowsPerPage}
         onClick={onClick}
       />;
     });

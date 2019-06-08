@@ -12,14 +12,15 @@ class MainContent extends Component {
 		filteredPokemons: [],
 		textFieldValue: '',
 		caught: 0,
+		limit: 5,
+		offset: 0,
 	};
 
 	componentDidMount() {
+		const { limit, offset } = this.state;
+
 		axios.get('https://pokeapi.co/api/v2/pokemon/', {
-      params: {
-        limit: 20,
-        offset: 0,
-      }
+      		params: {limit, offset}
 		})
 		.then(response => {
 			const promises = response.data.results.map(result => axios.get(result.url));
