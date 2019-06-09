@@ -14,18 +14,19 @@ import TablePaginationActions from '../TablePaginationActions';
 class PokemonTable extends Component {
   state = {
     count: 20,
-    page: 0,
-    rowsPerPage: 5,
-    offset: 0,
+    // rowsPerPage: 5,
+    // offset: 0,
   };
 
-  handleChangePage = (event, newPage) => {
-    this.setState({page: newPage});
-  }
+  // handleChangePage = (event, newPage) => {
+  //   const {onChangePage} = this.props;
+    
+  //   this.setState({page: newPage});
+  // }
 
-  handleChangeRowsPerPage = event => {
-    this.setState({rowsPerPage: parseInt(event.target.value, 10)});
-  }
+  // handleChangeRowsPerPage = event => {
+  //   this.setState({rowsPerPage: parseInt(event.target.value, 10)});
+  // }
 
   renderTableHeader() {
     return (
@@ -49,7 +50,8 @@ class PokemonTable extends Component {
   }
 
   renderTableFooter() {
-    const {count, page, rowsPerPage} = this.state;
+    const {count} = this.state;
+    const {onChangePage, onChangeRowsPerPage, page, rowsPerPage} = this.props;
 
     return (
       <TableFooter>
@@ -64,8 +66,8 @@ class PokemonTable extends Component {
               inputProps: { 'aria-label': 'Rows per page' },
               native: true,
             }}
-            onChangePage={this.handleChangePage}
-            onChangeRowsPerPage={this.handleChangeRowsPerPage}
+            onChangePage={onChangePage}
+            onChangeRowsPerPage={onChangeRowsPerPage}
             ActionsComponent={TablePaginationActions}
           />
         </TableRow>
@@ -74,8 +76,8 @@ class PokemonTable extends Component {
   }
 
   renderRows() {
-    const { page, rowsPerPage } = this.state;
-    const {pokemons, onClick } = this.props;
+    const {page, rowsPerPage, pokemons, onCatchClick } = this.props;
+    console.log(this.props);
 
     return pokemons.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(pokemon => {
       return <PokemonTableRow 
@@ -83,7 +85,7 @@ class PokemonTable extends Component {
         pokemon={pokemon}
         page={page}
         rowsPerPage={rowsPerPage}
-        onClick={onClick}
+        onClick={onCatchClick}
       />;
     });
   }

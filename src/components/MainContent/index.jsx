@@ -14,25 +14,23 @@ class MainContent extends Component {
 		caught: 0,
 		limit: 5,
 		offset: 0,
+		page: 0,
 	};
 
 	componentDidMount() {
-		const { limit, offset } = this.state;
+		const { limit, page } = this.state;
 
 		axios.get('https://pokeapi.co/api/v2/pokemon/', {
-      		params: {limit, offset}
+      		params: {limit, offset: limit * page}
 		})
-		.then(response => {
-			const promises = response.data.results.map(result => axios.get(result.url));
+		.then(({data: { results }}) => {
+			const promises = results.map(({url}) => axios.get(url));
 
 			return Promise.all(promises);
 		})
 		.then(response => {
-			const pokemons = response.map(pokemon => ({
-				id: pokemon.data.id,
-				name: pokemon.data.name,
-				types: pokemon.data.types,
-				experience: pokemon.data.base_experience,
+			const pokemons = response.map(({data: { id, name, types, base_experience: experience }}) => ({
+				id, name, types, experience
 			}));
 
 			this.setState({pokemons});
@@ -48,8 +46,8 @@ class MainContent extends Component {
 		);
 
     this.setState({
-			textFieldValue,
-			filteredPokemons,
+		textFieldValue,
+		filteredPokemons,
     });
   }
 
@@ -59,11 +57,20 @@ class MainContent extends Component {
 		}));
 	}
 
+	handleChangePage = (newPage) => {
+		this.setState({page: newPage});
+	}
+	
+	handleChangeRowsPerPage = event => {
+		this.setState({rowsPerPage: parseInt(event.target.value, 10)});
+	}
+
 	render() {
-		const { pokemons, filteredPokemons, textFieldValue, caught } = this.state;
+		const { pokemons, filteredPokemons, textFieldValue, caught, page, limit } = this.state;
+		// console.log(this.state);
 
 		return (
-      <div className={styles.div}>
+			<div className={styles.div}>
 				<SearchField
 					value={textFieldValue}
 					onChange={this.handleChange}
@@ -71,12 +78,16 @@ class MainContent extends Component {
 				<CaughtField
 					caught={caught}
 				/>
-        <PokemonTable
+        		<PokemonTable
+					page={page}
+					rowsPerPage={limit}
 					pokemons={textFieldValue ? filteredPokemons : pokemons}
-					onClick={this.handleCatchClick}
+					onCatchClick={this.handleCatchClick}
+					onChangePage={(event, newPage) => this.handleChangePage(newPage)}
+					onChangeRowsPerPage={event => this.handleChangeRowsPerPage(event)}
 				/>
 			</div>      
-    );
+    	);
 	}
 }
 
