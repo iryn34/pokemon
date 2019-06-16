@@ -1,73 +1,50 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import { connect } from 'react-redux';
+
 import styles from './styles.module.scss';
 
 import SearchField from '../SearchField';
 import CaughtField from '../CaughtField';
+import Spinner from '../Spinner';
 import PokemonTable from '../PokemonTable';
+import { 
+	fetchPokemons, 
+	filterPokemons
+} from '../../actions/actionCreators'; 
+
+const mapStateToProps = state => ({
+	count: state.count,
+	isLoading: state.isLoading
+});
+
+const mapDispatchToProps = dispatch => ({
+	fetchPokemons: (count) => dispatch(fetchPokemons(count)),
+	filterPokemons: name => dispatch(filterPokemons(name))
+});
 
 class MainContent extends Component {
 	state = {
-		pokemons: [],
-		filteredPokemons: [],
-		textFieldValue: '',
-		caught: 0,
-		limit: 5,
-		offset: 0,
-		page: 0,
+		textFieldValue: ''
 	};
 
 	componentDidMount() {
-		const { limit, page } = this.state;
+		const { count, fetchPokemons } = this.props;
 
-		axios.get('https://pokeapi.co/api/v2/pokemon/', {
-      		params: {limit, offset: limit * page}
-		})
-		.then(({data: { results }}) => {
-			const promises = results.map(({url}) => axios.get(url));
-
-			return Promise.all(promises);
-		})
-		.then(response => {
-			const pokemons = response.map(({data: { id, name, types, base_experience: experience }}) => ({
-				id, name, types, experience
-			}));
-
-			this.setState({pokemons});
-		});
+		fetchPokemons(count);
 	}
 
 	handleChange = event => {
-		const {pokemons} = this.state;
+		const { filterPokemons } = this.props;
 		const textFieldValue = event.target.value;
 
-		const filteredPokemons = pokemons.filter(
-			pokemon => pokemon.name.toLowerCase().startsWith(textFieldValue.toLowerCase())
-		);
+		filterPokemons(textFieldValue);
 
-    this.setState({
-		textFieldValue,
-		filteredPokemons,
-    });
+    this.setState({ textFieldValue });
   }
 
-	handleCatchClick = () => {
-		this.setState(state => ({
-			caught: state.caught + 1
-		}));
-	}
-
-	handleChangePage = (newPage) => {
-		this.setState({page: newPage});
-	}
-	
-	handleChangeRowsPerPage = event => {
-		this.setState({rowsPerPage: parseInt(event.target.value, 10)});
-	}
-
 	render() {
-		const { pokemons, filteredPokemons, textFieldValue, caught, page, limit } = this.state;
-		// console.log(this.state);
+		const { textFieldValue } = this.state;
+		const { isLoading } = this.props;
 
 		return (
 			<div className={styles.div}>
@@ -75,20 +52,11 @@ class MainContent extends Component {
 					value={textFieldValue}
 					onChange={this.handleChange}
 				/>
-				<CaughtField
-					caught={caught}
-				/>
-        		<PokemonTable
-					page={page}
-					rowsPerPage={limit}
-					pokemons={textFieldValue ? filteredPokemons : pokemons}
-					onCatchClick={this.handleCatchClick}
-					onChangePage={(event, newPage) => this.handleChangePage(newPage)}
-					onChangeRowsPerPage={event => this.handleChangeRowsPerPage(event)}
-				/>
+				<CaughtField />
+				{ isLoading ? (<Spinner />) : (<PokemonTable />) }
 			</div>      
     	);
 	}
 }
 
-export default MainContent;
+export default connect(mapStateToProps, mapDispatchToProps)(MainContent);

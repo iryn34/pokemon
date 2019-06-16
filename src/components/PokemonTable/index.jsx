@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Card from '@material-ui/core/Card';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -10,32 +11,43 @@ import TablePagination from '@material-ui/core/TablePagination';
 
 import PokemonTableRow from '../PokemonTableRow';
 import TablePaginationActions from '../TablePaginationActions';
+import styles from './styles.module.scss';
+
+import { changeRowsPerPage, changePage } from '../../actions/actionCreators'; 
+
+const mapStateToProps = state => ({
+	filteredPokemons: state.filteredPokemons,
+	rowsPerPage: state.rowsPerPage,
+	page: state.page,
+	count: state.count
+});
+
+const mapDispatchToProps = dispatch => ({
+	changeRowsPerPage: rowsPerPage => dispatch(changeRowsPerPage(rowsPerPage)),
+	changePage: newPage => dispatch(changePage(newPage))
+});
 
 class PokemonTable extends Component {
-  state = {
-    count: 20,
-    // rowsPerPage: 5,
-    // offset: 0,
+  handleChangePage = (_event, newPage) => {
+		const { changePage } = this.props;
+
+		changePage(newPage);
   };
+  
+  handleChangeRowsPerPage =	({ target: { value } }) => {
+		const { changeRowsPerPage } = this.props;
 
-  // handleChangePage = (event, newPage) => {
-  //   const {onChangePage} = this.props;
-    
-  //   this.setState({page: newPage});
-  // }
-
-  // handleChangeRowsPerPage = event => {
-  //   this.setState({rowsPerPage: parseInt(event.target.value, 10)});
-  // }
+		changeRowsPerPage(value);
+	}
 
   renderTableHeader() {
     return (
       <TableHead>
 				<TableRow>
-					<TableCell>Name</TableCell>
-					<TableCell align="right">Types</TableCell>
-					<TableCell align="right">Experience</TableCell>
-					<TableCell align="right">Caught</TableCell>
+					<TableCell className={styles.tableCell}>Name</TableCell>
+					<TableCell className={styles.tableCell} align="right">Types</TableCell>
+					<TableCell className={styles.tableCell} align="right">Experience</TableCell>
+					<TableCell className={styles.tableCell} align="right">Caught</TableCell>
 				</TableRow>
 			</TableHead> 
     );
@@ -50,8 +62,7 @@ class PokemonTable extends Component {
   }
 
   renderTableFooter() {
-    const {count} = this.state;
-    const {onChangePage, onChangeRowsPerPage, page, rowsPerPage} = this.props;
+    const { page, rowsPerPage, count } = this.props;
 
     return (
       <TableFooter>
@@ -66,8 +77,8 @@ class PokemonTable extends Component {
               inputProps: { 'aria-label': 'Rows per page' },
               native: true,
             }}
-            onChangePage={onChangePage}
-            onChangeRowsPerPage={onChangeRowsPerPage}
+            onChangePage={this.handleChangePage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
             ActionsComponent={TablePaginationActions}
           />
         </TableRow>
@@ -76,16 +87,12 @@ class PokemonTable extends Component {
   }
 
   renderRows() {
-    const {page, rowsPerPage, pokemons, onCatchClick } = this.props;
-    console.log(this.props);
+    const { page, rowsPerPage, filteredPokemons } = this.props;
 
-    return pokemons.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(pokemon => {
+    return filteredPokemons.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(pokemon => {
       return <PokemonTableRow 
         key={pokemon.id}
         pokemon={pokemon}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        onClick={onCatchClick}
       />;
     });
   }
@@ -103,4 +110,4 @@ class PokemonTable extends Component {
   }
 }
 
-export default PokemonTable;
+export default connect(mapStateToProps, mapDispatchToProps)(PokemonTable);

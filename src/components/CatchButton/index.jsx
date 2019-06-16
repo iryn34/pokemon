@@ -1,15 +1,22 @@
 import React, { Component } from 'react';
 import Button from '@material-ui/core/Button';
 
+import { catchPokemon } from '../../actions/actionCreators'; 
+import { connect } from 'react-redux';
+
+const mapDispatchToProps = dispatch => ({
+	catchPokemon: () => dispatch(catchPokemon())
+});
+
 class CatchButton extends Component {
 	state = {
 		disabled: false,
 	};
 
 	handleClick = () => {
-		const {onClick} = this.props;
+		const { catchPokemon } = this.props;
 
-		onClick();
+		catchPokemon();
 
 		this.setState({disabled: true});
 	};
@@ -30,4 +37,4 @@ class CatchButton extends Component {
 	}
 }
 
-export default CatchButton;
+export default connect(null, mapDispatchToProps)(CatchButton);

@@ -4,20 +4,19 @@ import TableRow from '@material-ui/core/TableRow';
 
 import CatchButton from '../CatchButton';
 import { upperCaseFirstLetter } from '../../lib/utils';
+import styles from './styles.module.scss';
 
 class PokemonTableRow extends Component {
   render() {
-    const {pokemon, onClick} = this.props;
+    const { pokemon } = this.props;
 
     return (
 			<TableRow>
-				<TableCell component="th" scope="row">{upperCaseFirstLetter(pokemon.name)}</TableCell>
-				<TableCell align="right">{upperCaseFirstLetter(pokemon.types[0].type.name)}</TableCell>
-				<TableCell align="right">{pokemon.experience}</TableCell>
-				<TableCell align="right">
-					<CatchButton
-						onClick={onClick}
-					/>
+				<TableCell className={styles.tableCell} component="th" scope="row">{upperCaseFirstLetter(pokemon.name)}</TableCell>
+				<TableCell className={styles.tableCell} align="right">{upperCaseFirstLetter(pokemon.types[0].type.name)}</TableCell>
+				<TableCell className={styles.tableCell} align="right">{pokemon.experience}</TableCell>
+				<TableCell className={styles.tableCell} align="right">
+					<CatchButton />
 				</TableCell>
 			</TableRow>
     );
